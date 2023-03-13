@@ -7,10 +7,10 @@ import (
 	"os"
 	"strings"
 
-	pcstat "github.com/tobert/pcstat/pkg"
+	"github.com/rfyiamcool/pgcacher/pkg/pcstats"
 )
 
-type PcStatusList []pcstat.PcStatus
+type PcStatusList []pcstats.PcStatus
 
 func (a PcStatusList) Len() int {
 	return len(a)

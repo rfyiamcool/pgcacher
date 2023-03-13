@@ -4,6 +4,8 @@
 
 pgcacher is used to get page cache statistics for files.
 
+**pgcacher design**
+
 ![](https://xiaorui-cc.oss-cn-hangzhou.aliyuncs.com/images/202303/202303121052113.png)
 
 ![](https://xiaorui-cc.oss-cn-hangzhou.aliyuncs.com/images/202303/202303131739063.png)
@@ -12,9 +14,12 @@ pgcacher is used to get page cache statistics for files.
 
 ```sh
 pgcacher <-json <-pps>|-terse|-default> <-nohdr> <-bname> file file file
-    -worker concurrency workers
-    -pid int show all open maps for the given pid
-    -top int show top x cached files in descending order
+    -worker concurrency workers, default: 2
+    -pid show all open maps for the given pid
+    -top show top x cached files in descending order
+    -lease-size ignore files smaller than the lastSize, such as '10MB' and '15GB'
+    -exclude-files exclude the specified files by wildcard, such as 'a*c?d' and '*xiaorui*,rfyiamcool'
+    -include-files only include the specified files by wildcard, such as 'a*c?d' and '*xiaorui?cc,rfyiamcool'
     -json output will be JSON
     -pps include the per-page information in the output (can be huge!)
     -terse print terse machine-parseable output
