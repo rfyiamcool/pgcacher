@@ -39,13 +39,13 @@ func init() {
 
 func main() {
 	// prepare phase
+	flag.Parse()
 	if runtime.GOOS != "linux" {
 		log.Fatalf("pgcacher only support running on Linux !!!")
 	}
 	leastSize, _ := humanize.ParseBytes(leastSizeFlag)
 
 	// running phase
-	flag.Parse()
 	files := flag.Args()
 	pg := pgcacher{files: files, leastSize: int64(leastSize)}
 
