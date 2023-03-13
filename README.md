@@ -1,14 +1,12 @@
 ## pgcacher 
 
+`pgcacher` is used to get page cache statistics for files. Use the **pgcacher** command to know how much cache space the fd of the specified process occupies in the page cache.  Use **pgcacher** to know whether the specified file list is cached in the page cache, and how much space is cached.
+
+Compared with pcstat, `pgcacher` has fixed the problem that the file list of the process is incorrect. It used to be obtained through `/proc/{pid}/maps`, but now it is changed to obtain from `/proc/{pid}/maps` and `/proc/{pid}/fd` at the same time. pgcacher supports more parameters, such as top, worker, least-size, exclude-files and include-files. 😁
+
+In addition, the pgcacher code is more robust, and also supports concurrency parameters, which can calculate the cache occupancy in the page cache faster.
+
 > the some code of pgcacher copy from pcstat and hcache.
-
-pgcacher is used to get page cache statistics for files.
-
-**pgcacher design**
-
-![](https://xiaorui-cc.oss-cn-hangzhou.aliyuncs.com/images/202303/202303121052113.png)
-
-![](https://xiaorui-cc.oss-cn-hangzhou.aliyuncs.com/images/202303/202303131739063.png)
 
 ## Usage
 
@@ -103,6 +101,13 @@ $ sudo pgcacher /root/rui/*
 │ Sum        │ 10.746G        │ 2817091     │ 10.746G        │ 2817091     │ 100.000 │
 +------------+----------------+-------------+----------------+-------------+---------+
 ```
+
+## pgcacher design
+
+![](https://xiaorui-cc.oss-cn-hangzhou.aliyuncs.com/images/202303/202303121052113.png)
+
+![](https://xiaorui-cc.oss-cn-hangzhou.aliyuncs.com/images/202303/202303131739063.png)
+
 
 ## Thanks to
 
