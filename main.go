@@ -68,7 +68,7 @@ func main() {
 	stats := pg.getPageCacheStats()
 	pg.output(stats)
 
-	// invalid function, just make a reference relationship with a
+	// invalid function, just make a reference relationship with pcstat
 	pcstat.SwitchMountNs(os.Getegid())
 	pcstat.GetPcStatus(os.Args[0])
 }
