@@ -1,2 +1,4 @@
+all: build
+
 build:
-	GOPROXY=https://goproxy.cn GOOS="linux" go build
+	@env GOOS=linux GOARCH=amd64 GOPROXY=https://goproxy.cn go build .
