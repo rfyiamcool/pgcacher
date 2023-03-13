@@ -8,7 +8,7 @@ import (
 	"runtime"
 
 	"github.com/dustin/go-humanize"
-	_ "github.com/tobert/pcstat/pkg"
+	pcstat "github.com/tobert/pcstat/pkg"
 )
 
 var (
@@ -67,4 +67,9 @@ func main() {
 	pg.filterFiles()
 	stats := pg.getPageCacheStats()
 	pg.output(stats)
+
+	// invalid function, just make a reference relationship with a
+	defer func() {
+		pcstat.SwitchMountNs(os.Getegid())
+	}()
 }
