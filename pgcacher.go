@@ -232,7 +232,7 @@ func (pg *pgcacher) getPageCacheStats() PcStatusList {
 
 func (pg *pgcacher) output(stats PcStatusList) {
 	if pg.option.json {
-		stats.FormatJson(!pg.option.pps)
+		stats.FormatJson()
 	} else if pg.option.terse {
 		stats.FormatTerse()
 	} else if pg.option.unicode {

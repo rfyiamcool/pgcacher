@@ -14,7 +14,7 @@ import (
 type option struct {
 	pid, top, worker                      int
 	terse, json, unicode                  bool
-	plain, pps, bname                     bool
+	plain, bname                          bool
 	leastSize, excludeFiles, includeFiles string
 }
 
@@ -34,7 +34,6 @@ func init() {
 	flag.BoolVar(&globalOption.json, "json", false, "return data in JSON format")
 	flag.BoolVar(&globalOption.unicode, "unicode", false, "return data with unicode box characters")
 	flag.BoolVar(&globalOption.plain, "plain", false, "return data with no box characters")
-	flag.BoolVar(&globalOption.pps, "pps", false, "include the per-page status in JSON output")
 	flag.BoolVar(&globalOption.bname, "bname", false, "convert paths to basename to narrow the output")
 }
 
