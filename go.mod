@@ -3,7 +3,8 @@ module github.com/rfyiamcool/pgcacher
 go 1.14
 
 require (
-	github.com/dustin/go-humanize v1.0.1 // indirect
+	github.com/dustin/go-humanize v1.0.1
+	github.com/stretchr/testify v1.8.2
 	github.com/tobert/pcstat v0.0.1
 	golang.org/x/sys v0.0.0-20211116061358-0a5406a5449c
 )

@@ -125,7 +125,7 @@ func (pg *pgcacher) getProcessFdFiles(pid int) []string {
 		if strings.HasPrefix(target, "/dev") { // ignore devices
 			return
 		}
-		if pg.ignoreFile(file.Name()) {
+		if pg.ignoreFile(target) {
 			return
 		}
 
@@ -183,12 +183,12 @@ func (pg *pgcacher) getPageCacheStats() PcStatusList {
 	ignoreFunc := func(file *os.File) error {
 		fs, err := file.Stat()
 		if err != nil {
-			return nil
+			return err
 		}
 		if pg.leastSize != 0 && fs.Size() < pg.leastSize {
-			return nil
+			return errLessThanSize
 		}
-		return errLessThanSize
+		return nil
 	}
 
 	analyse := func(fname string) {
@@ -304,6 +304,10 @@ func min(x, y int) int {
 }
 
 func wildcardMatch(s string, p string) bool {
+	if strings.Contains(s, p) {
+		return true
+	}
+
 	runeInput := []rune(s)
 	runePattern := []rune(p)
 
