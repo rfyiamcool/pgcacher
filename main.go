@@ -69,7 +69,6 @@ func main() {
 	pg.output(stats)
 
 	// invalid function, just make a reference relationship with a
-	defer func() {
-		pcstat.SwitchMountNs(os.Getegid())
-	}()
+	pcstat.SwitchMountNs(os.Getegid())
+	pcstat.GetPcStatus(os.Args[0])
 }
