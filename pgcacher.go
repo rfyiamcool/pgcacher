@@ -21,14 +21,15 @@ type emptyNull struct{}
 type pgcacher struct {
 	files     []string
 	leastSize int64
+	option    *option
 }
 
 func (pg *pgcacher) ignoreFile(file string) bool {
-	if excludeFilesFlag != "" && wildcardMatch(file, excludeFilesFlag) {
+	if pg.option.excludeFiles != "" && wildcardMatch(file, pg.option.excludeFiles) {
 		return true
 	}
 
-	if includeFilesFlag != "" && !wildcardMatch(file, includeFilesFlag) {
+	if pg.option.includeFiles != "" && !wildcardMatch(file, pg.option.includeFiles) {
 		return true
 	}
 
@@ -59,7 +60,7 @@ func (pg *pgcacher) appendProcessFiles(pid int) {
 
 func (pg *pgcacher) getProcessFiles(pid int) []string {
 	// switch mount namespace for container.
-	pcstats.SwitchMountNs(pidFlag)
+	pcstats.SwitchMountNs(pg.option.pid)
 
 	// get files of `/proc/{pid}/fd` and `/proc/{pid}/maps`
 	processFiles := pg.getProcessFdFiles(pid)
@@ -148,7 +149,7 @@ func (pg *pgcacher) getProcessFdFiles(pid int) []string {
 
 	// handle files concurrently.
 	wg := sync.WaitGroup{}
-	for i := 0; i < workerFlag; i++ {
+	for i := 0; i < pg.option.worker; i++ {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
@@ -202,7 +203,7 @@ func (pg *pgcacher) getPageCacheStats() PcStatusList {
 		}
 
 		// only get filename, trim full dir path of the file.
-		if bnameFlag {
+		if pg.option.bname {
 			status.Name = path.Base(fname)
 		}
 
@@ -213,7 +214,7 @@ func (pg *pgcacher) getPageCacheStats() PcStatusList {
 	}
 
 	// analyse page cache stats of files concurrently.
-	for i := 0; i < workerFlag; i++ {
+	for i := 0; i < pg.option.worker; i++ {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
@@ -230,13 +231,13 @@ func (pg *pgcacher) getPageCacheStats() PcStatusList {
 }
 
 func (pg *pgcacher) output(stats PcStatusList) {
-	if jsonFlag {
-		stats.FormatJson(!ppsFlag)
-	} else if terseFlag {
+	if pg.option.json {
+		stats.FormatJson(!pg.option.pps)
+	} else if pg.option.terse {
 		stats.FormatTerse()
-	} else if unicodeFlag {
+	} else if pg.option.unicode {
 		stats.FormatUnicode()
-	} else if plainFlag {
+	} else if pg.option.plain {
 		stats.FormatPlain()
 	} else {
 		stats.FormatText()
@@ -271,7 +272,7 @@ func (pg *pgcacher) handleTop(top int) {
 	close(queue)
 
 	// append open fd of each process.
-	for i := 0; i < workerFlag; i++ {
+	for i := 0; i < pg.option.worker; i++ {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()

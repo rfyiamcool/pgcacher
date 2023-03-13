@@ -11,30 +11,31 @@ import (
 	pcstat "github.com/tobert/pcstat/pkg"
 )
 
-var (
-	pidFlag, topFlag, workerFlag                      int
-	terseFlag, nohdrFlag, jsonFlag, unicodeFlag       bool
-	plainFlag, ppsFlag, bnameFlag                     bool
-	leastSizeFlag, excludeFilesFlag, includeFilesFlag string
-)
+type option struct {
+	pid, top, worker                      int
+	terse, json, unicode                  bool
+	plain, pps, bname                     bool
+	leastSize, excludeFiles, includeFiles string
+}
+
+var globalOption = new(option)
 
 func init() {
 	// basic params
-	flag.IntVar(&pidFlag, "pid", 0, "show all open maps for the given pid")
-	flag.IntVar(&topFlag, "top", 0, "show top x cached files in descending order")
-	flag.IntVar(&workerFlag, "worker", 2, "concurrency workers")
-	flag.StringVar(&leastSizeFlag, "least-size", "0mb", "ignore files smaller than the lastSize, such as 10MB and 15GB")
-	flag.StringVar(&excludeFilesFlag, "exclude-files", "", "exclude the specified files by wildcard, such as 'a*c?d' and '*xiaorui*,rfyiamcool'")
-	flag.StringVar(&includeFilesFlag, "include-files", "", "only include the specified files by wildcard, such as 'a*c?d' and '*xiaorui?cc,rfyiamcool'")
+	flag.IntVar(&globalOption.pid, "pid", 0, "show all open maps for the given pid")
+	flag.IntVar(&globalOption.top, "top", 0, "scan the open files of all processes, show the top few files that occupy the most memory space in the page cache.")
+	flag.IntVar(&globalOption.worker, "worker", 2, "concurrency workers")
+	flag.StringVar(&globalOption.leastSize, "least-size", "0mb", "ignore files smaller than the lastSize, such as 10MB and 15GB")
+	flag.StringVar(&globalOption.excludeFiles, "exclude-files", "", "exclude the specified files by wildcard, such as 'a*c?d' and '*xiaorui*,rfyiamcool'")
+	flag.StringVar(&globalOption.includeFiles, "include-files", "", "only include the specified files by wildcard, such as 'a*c?d' and '*xiaorui?cc,rfyiamcool'")
 
 	// show params
-	flag.BoolVar(&terseFlag, "terse", false, "show terse output")
-	flag.BoolVar(&nohdrFlag, "nohdr", false, "omit the header from terse & text output")
-	flag.BoolVar(&jsonFlag, "json", false, "return data in JSON format")
-	flag.BoolVar(&unicodeFlag, "unicode", false, "return data with unicode box characters")
-	flag.BoolVar(&plainFlag, "plain", false, "return data with no box characters")
-	flag.BoolVar(&ppsFlag, "pps", false, "include the per-page status in JSON output")
-	flag.BoolVar(&bnameFlag, "bname", false, "convert paths to basename to narrow the output")
+	flag.BoolVar(&globalOption.terse, "terse", false, "show terse output")
+	flag.BoolVar(&globalOption.json, "json", false, "return data in JSON format")
+	flag.BoolVar(&globalOption.unicode, "unicode", false, "return data with unicode box characters")
+	flag.BoolVar(&globalOption.plain, "plain", false, "return data with no box characters")
+	flag.BoolVar(&globalOption.pps, "pps", false, "include the per-page status in JSON output")
+	flag.BoolVar(&globalOption.bname, "bname", false, "convert paths to basename to narrow the output")
 }
 
 func main() {
@@ -43,19 +44,19 @@ func main() {
 	if runtime.GOOS != "linux" {
 		log.Fatalf("pgcacher only support running on Linux !!!")
 	}
-	leastSize, _ := humanize.ParseBytes(leastSizeFlag)
+	leastSize, _ := humanize.ParseBytes(globalOption.leastSize)
 
 	// running phase
 	files := flag.Args()
-	pg := pgcacher{files: files, leastSize: int64(leastSize)}
+	pg := pgcacher{files: files, leastSize: int64(leastSize), option: globalOption}
 
-	if topFlag != 0 {
-		pg.handleTop(topFlag)
+	if globalOption.top != 0 {
+		pg.handleTop(globalOption.top)
 		os.Exit(0)
 	}
 
-	if pidFlag != 0 {
-		pg.appendProcessFiles(pidFlag)
+	if globalOption.pid != 0 {
+		pg.appendProcessFiles(globalOption.pid)
 	}
 
 	if len(pg.files) == 0 {
