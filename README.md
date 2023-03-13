@@ -4,6 +4,10 @@
 
 pgcacher is used to get page cache statistics for files.
 
+![](https://xiaorui-cc.oss-cn-hangzhou.aliyuncs.com/images/202303/202303121052113.png)
+
+![](https://xiaorui-cc.oss-cn-hangzhou.aliyuncs.com/images/202303/202303131739063.png)
+
 ## Usage
 
 ```sh
@@ -23,11 +27,23 @@ pgcacher <-json <-pps>|-terse|-default> <-nohdr> <-bname> file file file
 
 ## Install
 
+**compile source code**
+
 ```sh
 git clone https://github.com/rfyiamcool/pgcacher.git
 cd pgcacher
 make build
 sudo cp pgcacher /usr/local/bin/ 
+```
+
+**use binary directly**
+
+test pass on ubuntu, centos 7.x and centos 8.x.
+
+```
+wget xiaorui-cc.oss-cn-hangzhou.aliyuncs.com/files/pgcacher
+chmod 777 pgcacher
+\mv pgcacher /usr/local/bin
 ```
 
 ## Usage
@@ -82,12 +98,6 @@ $ sudo pgcacher /root/rui/*
 │ Sum        │ 10.746G        │ 2817091     │ 10.746G        │ 2817091     │ 100.000 │
 +------------+----------------+-------------+----------------+-------------+---------+
 ```
-
-## Design
-
-![](https://xiaorui-cc.oss-cn-hangzhou.aliyuncs.com/images/202303/202303121322456.png)
-
-![](https://xiaorui-cc.oss-cn-hangzhou.aliyuncs.com/images/202303/202303121322456.png)
 
 ## Thanks to
 
