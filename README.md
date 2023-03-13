@@ -4,9 +4,11 @@
 
 Compared with pcstat, `pgcacher` has fixed the problem that the file list of the process is incorrect. It used to be obtained through `/proc/{pid}/maps`, but now it is changed to obtain from `/proc/{pid}/maps` and `/proc/{pid}/fd` at the same time. pgcacher supports more parameters, such as top, worker, least-size, exclude-files and include-files. 😁
 
-In addition, the pgcacher code is more robust, and also supports concurrency parameters, which can calculate the cache occupancy in the page cache faster.
+In addition, the pgcacher code is more robust, and also supports concurrency parameters, which can calculate the cache occupancy in the page cache faster. 
 
-> the some code of pgcacher copy from pcstat and hcache.
+🚀 pgcacher has better performance than pcstat, and the performance gap becomes more obvious as the number of files increases. Can be up to 5x faster than pcstat for most scenarios.
+
+> the some code of pkg/pcstats copy from pcstat and hcache.
 
 ## Usage
 
@@ -14,7 +16,7 @@ In addition, the pgcacher code is more robust, and also supports concurrency par
 pgcacher <-json <-pps>|-terse|-default> <-nohdr> <-bname> file file file
     -worker concurrency workers, default: 2
     -pid show all open maps for the given pid
-    -top show top x cached files in descending order
+    -top scan the open files of all processes, show the top few files that occupy the most memory space in the page cache.
     -lease-size ignore files smaller than the lastSize, such as '10MB' and '15GB'
     -exclude-files exclude the specified files by wildcard, such as 'a*c?d' and '*xiaorui*,rfyiamcool'
     -include-files only include the specified files by wildcard, such as 'a*c?d' and '*xiaorui?cc,rfyiamcool'

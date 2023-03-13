@@ -15,9 +15,11 @@ type PcStatusList []pcstats.PcStatus
 func (a PcStatusList) Len() int {
 	return len(a)
 }
+
 func (a PcStatusList) Swap(i, j int) {
 	a[i], a[j] = a[j], a[i]
 }
+
 func (a PcStatusList) Less(i, j int) bool {
 	return a[j].Cached < a[i].Cached
 }
@@ -36,11 +38,9 @@ func (stats PcStatusList) FormatUnicode() {
 	fmt.Println(top)
 
 	// -nohdr may be chosen to save 2 lines of precious vertical space
-	if !nohdrFlag {
-		pad = strings.Repeat(" ", maxName-4)
-		fmt.Printf("│ Name%s │ Size           │ Pages       │ Cached Size    │ Cached Pages│ Percent │\n", pad)
-		fmt.Println(hr)
-	}
+	pad = strings.Repeat(" ", maxName-4)
+	fmt.Printf("│ Name%s │ Size           │ Pages       │ Cached Size    │ Cached Pages│ Percent │\n", pad)
+	fmt.Println(hr)
 
 	for _, pcs := range stats {
 		pad = strings.Repeat(" ", maxName-len(pcs.Name))
@@ -81,11 +81,9 @@ func (stats PcStatusList) FormatText() {
 	fmt.Println(top)
 
 	// -nohdr may be chosen to save 2 lines of precious vertical space
-	if !nohdrFlag {
-		pad = strings.Repeat(" ", maxName-4)
-		fmt.Printf("| Name%s | Size           │ Pages       │ Cached Size    │ Cached Pages│ Percent │\n", pad)
-		fmt.Println(hr)
-	}
+	pad = strings.Repeat(" ", maxName-4)
+	fmt.Printf("| Name%s | Size           │ Pages       │ Cached Size    │ Cached Pages│ Percent │\n", pad)
+	fmt.Println(hr)
 
 	for _, pcs := range stats {
 		pad = strings.Repeat(" ", maxName-len(pcs.Name))
@@ -115,10 +113,8 @@ func (stats PcStatusList) FormatPlain() {
 	var size_sum, page_sum, cached_page_sum, cached_size, cached_size_sum int64
 
 	// -nohdr may be chosen to save 2 lines of precious vertical space
-	if !nohdrFlag {
-		pad := strings.Repeat(" ", maxName-4)
-		fmt.Printf("Name%s  Size            Pages        Cached Size     Cached Pages Percent\n", pad)
-	}
+	pad := strings.Repeat(" ", maxName-4)
+	fmt.Printf("Name%s  Size            Pages        Cached Size     Cached Pages Percent\n", pad)
 
 	for _, pcs := range stats {
 		pad := strings.Repeat(" ", maxName-len(pcs.Name))
@@ -135,16 +131,13 @@ func (stats PcStatusList) FormatPlain() {
 		cached_size_sum += cached_size
 	}
 
-	pad := strings.Repeat(" ", maxName-len("Sum"))
+	pad = strings.Repeat(" ", maxName-len("Sum"))
 	fmt.Printf("%s%s  %-15s %-12d %-15s %-12d %-7.3f\n",
 		"Sum", pad, ConvertUnit(size_sum), page_sum, ConvertUnit(cached_size_sum), cached_page_sum, (float64(cached_page_sum)/float64(page_sum))*100.00)
 }
 
 func (stats PcStatusList) FormatTerse() {
-
-	if !nohdrFlag {
-		fmt.Println("name,size,timestamp,mtime,pages,cached,percent")
-	}
+	fmt.Println("name,size,timestamp,mtime,pages,cached,percent")
 	for _, pcs := range stats {
 		time := pcs.Timestamp.Unix()
 		mtime := pcs.Mtime.Unix()
