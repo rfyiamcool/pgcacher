@@ -24,9 +24,15 @@ import (
 	"golang.org/x/sys/unix"
 )
 
+type Mincore struct {
+	Cached int64
+	Miss   int64
+	Bytes  []bool
+}
+
 // mmap the given file, get the mincore vector, then
 // return it as an []bool
-func FileMincore(f *os.File, size int64) ([]bool, error) {
+func FileMincore(f *os.File, size int64) (*Mincore, error) {
 	//skip could not mmap error when the file size is 0
 	if int(size) == 0 {
 		return nil, nil
@@ -62,15 +68,19 @@ func FileMincore(f *os.File, size int64) ([]bool, error) {
 	defer unix.Munmap(mmap)
 
 	mc := make([]bool, vecsz)
+	value := new(Mincore)
 
 	// there is no bitshift only bool
 	for i, b := range vec {
 		if b%2 == 1 {
+			value.Cached++
 			mc[i] = true
 		} else {
+			value.Miss++
 			mc[i] = false
 		}
 	}
 
-	return mc, nil
+	value.Bytes = mc
+	return value, nil
 }

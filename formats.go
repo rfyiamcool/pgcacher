@@ -146,15 +146,7 @@ func (stats PcStatusList) FormatTerse() {
 	}
 }
 
-func (stats PcStatusList) FormatJson(clearpps bool) {
-	// clear the per-page status when requested
-	// emits an empty "status": [] field in the JSON when disabled, but NBD.
-	if clearpps {
-		for i := range stats {
-			stats[i].PPStat = nil
-		}
-	}
-
+func (stats PcStatusList) FormatJson() {
 	b, err := json.Marshal(stats)
 	if err != nil {
 		log.Fatalf("JSON formatting failed: %s\n", err)

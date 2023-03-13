@@ -35,7 +35,6 @@ type PcStatus struct {
 	Cached    int       `json:"cached"`    // number of pages that are cached
 	Uncached  int       `json:"uncached"`  // number of pages that are not cached
 	Percent   float64   `json:"percent"`   // percentage of pages cached
-	PPStat    []bool    `json:"status"`    // per-page status, true if cached, false otherwise
 }
 
 func GetPcStatus(fname string, filter func(f *os.File) error) (PcStatus, error) {
@@ -57,7 +56,6 @@ func GetPcStatus(fname string, filter func(f *os.File) error) (PcStatus, error) 
 	// what will be in there when the file is truncated between here and the
 	// mincore() call.
 	fi, err := f.Stat()
-
 	if err != nil {
 		return pcs, fmt.Errorf("could not stat file: %v", err)
 	}
@@ -69,20 +67,16 @@ func GetPcStatus(fname string, filter func(f *os.File) error) (PcStatus, error) 
 	pcs.Timestamp = time.Now()
 	pcs.Mtime = fi.ModTime()
 
-	pcs.PPStat, err = FileMincore(f, fi.Size())
-
+	mincore, err := FileMincore(f, fi.Size())
 	if err != nil {
 		return pcs, err
 	}
 
-	// count the number of cached pages
-	for _, b := range pcs.PPStat {
-		if b {
-			pcs.Cached++
-		}
-	}
-	pcs.Pages = len(pcs.PPStat)
-	pcs.Uncached = pcs.Pages - pcs.Cached
+	pcs.Cached = int(mincore.Cached)
+	// pcs.Pages = len(pcs.PPStat)
+	// pcs.Uncached = pcs.Pages - pcs.Cached
+	pcs.Pages = int(mincore.Cached) + int(mincore.Miss)
+	pcs.Uncached = int(mincore.Miss)
 
 	// convert to float for the occasional sparsely-cached file
 	// see the README.md for how to produce one
