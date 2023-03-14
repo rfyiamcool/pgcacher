@@ -12,7 +12,7 @@ import (
 )
 
 type option struct {
-	pid, top, worker                      int
+	pid, top, worker, depth               int
 	terse, json, unicode                  bool
 	plain, bname                          bool
 	leastSize, excludeFiles, includeFiles string
@@ -24,6 +24,7 @@ func init() {
 	// basic params
 	flag.IntVar(&globalOption.pid, "pid", 0, "show all open maps for the given pid")
 	flag.IntVar(&globalOption.top, "top", 0, "scan the open files of all processes, show the top few files that occupy the most memory space in the page cache.")
+	flag.IntVar(&globalOption.depth, "depth", 0, "set the depth of dirs to scan")
 	flag.IntVar(&globalOption.worker, "worker", 2, "concurrency workers")
 	flag.StringVar(&globalOption.leastSize, "least-size", "0mb", "ignore files smaller than the lastSize, such as 10MB and 15GB")
 	flag.StringVar(&globalOption.excludeFiles, "exclude-files", "", "exclude the specified files by wildcard, such as 'a*c?d' and '*xiaorui*,rfyiamcool'")
@@ -47,6 +48,9 @@ func main() {
 
 	// running phase
 	files := flag.Args()
+	files = walkDirs(files, globalOption.depth)
+
+	// init pgcacher obj
 	pg := pgcacher{files: files, leastSize: int64(leastSize), option: globalOption}
 
 	if globalOption.top != 0 {

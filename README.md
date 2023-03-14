@@ -2,7 +2,7 @@
 
 `pgcacher` is used to get page cache statistics for files. Use the **pgcacher** command to know how much cache space the fd of the specified process occupies in the page cache.  Use **pgcacher** to know whether the specified file list is cached in the page cache, and how much space is cached.
 
-Compared with pcstat, `pgcacher` has fixed the problem that the file list of the process is incorrect. It used to be obtained through `/proc/{pid}/maps`, but now it is changed to obtain from `/proc/{pid}/maps` and `/proc/{pid}/fd` at the same time. pgcacher supports more parameters, such as top, worker, least-size, exclude-files and include-files. 😁
+Compared with pcstat, `pgcacher` has fixed the problem that the file list of the process is incorrect. It used to be obtained through `/proc/{pid}/maps`, but now it is changed to obtain from `/proc/{pid}/maps` and `/proc/{pid}/fd` at the same time. pgcacher supports more parameters, such as top, worker, depth, least-size, exclude-files and include-files. 😁
 
 In addition, the pgcacher code is more robust, and also supports concurrency parameters, which can calculate the cache occupancy in the page cache faster. 
 
@@ -14,6 +14,7 @@ In addition, the pgcacher code is more robust, and also supports concurrency par
 
 ```sh
 pgcacher <-json <-pps>|-terse|-default> <-nohdr> <-bname> file file file
+    -depth set the depth of dirs to scan.
     -worker concurrency workers, default: 2
     -pid show all open maps for the given pid
     -top scan the open files of all processes, show the top few files that occupy the most memory space in the page cache.
@@ -120,6 +121,23 @@ chmod 777 pgcacher
 |------------------+----------------+-------------+----------------+-------------+---------|
 │ Sum              │ 8.789G         │ 2304000     │ 8.789G         │ 2304000     │ 100.000 │
 +------------------+----------------+-------------+----------------+-------------+---------+
+
+# sudo pgcacher -depth=4 aaa/
+
++---------------------+----------------+-------------+----------------+-------------+---------+
+| Name                | Size           │ Pages       │ Cached Size    │ Cached Pages│ Percent │
+|---------------------+----------------+-------------+----------------+-------------+---------|
+| aaa/a2g             | 1.953G         | 512000      | 1.953G         | 512000      | 100.000 |
+| aaa/bbb/ccc/ddd/d2g | 1.953G         | 512000      | 1.940G         | 508531      | 99.322  |
+| aaa/bbb/ccc/c1g     | 1000.000M      | 256000      | 1000.000M      | 256000      | 100.000 |
+| aaa/bbb/ccc/c2g     | 1.953G         | 512000      | 1000.000M      | 256000      | 50.000  |
+| aaa/bbb/ccc/ddd/d1g | 1000.000M      | 256000      | 1000.000M      | 256000      | 100.000 |
+| aaa/a1g             | 1000.000M      | 256000      | 1000.000M      | 256000      | 100.000 |
+| aaa/bbb/bbb1g       | 1000.000M      | 256000      | 1000.000M      | 256000      | 100.000 |
+| aaa/bbb/bbb2g       | 1.953G         | 512000      | 1000.000M      | 256000      | 50.000  |
+|---------------------+----------------+-------------+----------------+-------------+---------|
+│ Sum                 │ 11.719G        │ 3072000     │ 9.752G         │ 2556531     │ 83.220  │
++---------------------+----------------+-------------+----------------+-------------+---------+
 ```
 
 ## pgcacher design

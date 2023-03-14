@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
+	"io/ioutil"
 	"log"
 	"os"
 	"path"
@@ -352,4 +353,60 @@ func wildcardMatch(s string, p string) bool {
 	}
 
 	return isMatchingMatrix[lenInput][lenPattern]
+}
+
+func walkDirs(dirs []string, maxDepth int) []string {
+	if len(dirs) == 0 {
+		return dirs
+	}
+
+	var files []string
+	for _, dir := range dirs {
+		fi, err := os.Open(dir)
+		if err != nil {
+			files = append(files, dir)
+			continue
+		}
+
+		fs, err := fi.Stat()
+		if err != nil {
+			files = append(files, dir)
+			continue
+		}
+
+		// is dir
+		if fs.IsDir() {
+			files = append(files, walkDir(dir, 0, maxDepth)...)
+			continue
+		}
+
+		// is file
+		files = append(files, dir)
+	}
+
+	return files
+}
+
+func walkDir(dir string, depth int, maxDepth int) []string {
+	if depth >= maxDepth {
+		return nil
+	}
+
+	var files []string
+	ofiles, err := ioutil.ReadDir(dir)
+	if err != nil {
+		return nil
+	}
+
+	for _, file := range ofiles {
+		curdir := path.Join(dir, file.Name())
+		if file.IsDir() {
+			files = append(files, walkDir(curdir, depth+1, maxDepth)...)
+			continue
+		}
+
+		files = append(files, curdir)
+	}
+
+	return files
 }
