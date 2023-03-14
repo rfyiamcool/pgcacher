@@ -3,3 +3,5 @@
 .vscode
 pgcacher
 .DS_Store
+
+dist/
