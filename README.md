@@ -128,7 +128,6 @@ chmod 777 pgcacher
 
 ![](https://xiaorui-cc.oss-cn-hangzhou.aliyuncs.com/images/202303/202303131739063.png)
 
-
 ## Thanks to
 
 @tobert for pcstat

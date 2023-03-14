@@ -27,7 +27,6 @@ import (
 type Mincore struct {
 	Cached int64
 	Miss   int64
-	Bytes  []bool
 }
 
 // mmap the given file, get the mincore vector, then
@@ -67,20 +66,14 @@ func GetFileMincore(f *os.File, size int64) (*Mincore, error) {
 	}
 	defer unix.Munmap(mmap)
 
-	bbs := make([]bool, vecsz)
 	value := new(Mincore)
-
-	// there is no bitshift only bool
-	for i, b := range vec {
+	for _, b := range vec {
 		if b%2 == 1 {
 			value.Cached++
-			bbs[i] = true
 		} else {
 			value.Miss++
-			bbs[i] = false
 		}
 	}
 
-	value.Bytes = bbs
 	return value, nil
 }
