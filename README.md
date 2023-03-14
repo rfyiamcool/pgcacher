@@ -8,7 +8,7 @@ In addition, the pgcacher code is more robust, and also supports concurrency par
 
 🚀 pgcacher has better performance than pcstat, and the performance gap becomes more obvious as the number of files increases. Can be up to 5x faster than pcstat for most scenarios.
 
-> the some code of pkg/pcstats copy from pcstat and hcache.
+> the some code of `pkg/pcstats` copy from pcstat and hcache.
 
 ## Usage
 
@@ -32,14 +32,19 @@ pgcacher <-json <-pps>|-terse|-default> <-nohdr> <-bname> file file file
 
 ## Install
 
-**compile source code**
+**source code compilation**
 
 ```sh
 git clone https://github.com/rfyiamcool/pgcacher.git
 cd pgcacher
 make build
 sudo cp pgcacher /usr/local/bin/ 
+pgcacher -h
 ```
+
+**github releases**
+
+[https://github.com/rfyiamcool/pgcacher/releases](https://github.com/rfyiamcool/pgcacher/releases)
 
 **use binary directly**
 
@@ -48,13 +53,13 @@ test pass on ubuntu, centos 7.x and centos 8.x.
 ```
 wget xiaorui-cc.oss-cn-hangzhou.aliyuncs.com/files/pgcacher
 chmod 777 pgcacher
-\mv pgcacher /usr/local/bin
+\cp pgcacher /usr/local/bin
 ```
 
 ## Usage
 
 ```
-$ sudo pgcacher -pid=29260 -worker=5
+# sudo pgcacher -pid=29260 -worker=5
 +-------------------+----------------+-------------+----------------+-------------+---------+
 | Name              | Size           │ Pages       │ Cached Size    │ Cached Pages│ Percent │
 |-------------------+----------------+-------------+----------------+-------------+---------|
@@ -67,13 +72,13 @@ $ sudo pgcacher -pid=29260 -worker=5
 │ Sum               │ 9.767G         │ 2560459     │ 9.767G         │ 2560459     │ 100.000 │
 +-------------------+----------------+-------------+----------------+-------------+---------+
 
-$ dd if=/dev/urandom of=file1g bs=1M count=1000
-$ dd if=/dev/urandom of=file2g bs=1M count=2000
-$ dd if=/dev/urandom of=file3g bs=1M count=3000
-$ dd if=/dev/urandom of=file4g bs=1M count=4000
-$ cat file1g file2g file3g file4g > /dev/null
+# dd if=/dev/urandom of=file1g bs=1M count=1000
+# dd if=/dev/urandom of=file2g bs=1M count=2000
+# dd if=/dev/urandom of=file3g bs=1M count=3000
+# dd if=/dev/urandom of=file4g bs=1M count=4000
+# cat file1g file2g file3g file4g > /dev/null
 
-$ sudo pgcacher file1g file2g file3g file4g
+# sudo pgcacher file1g file2g file3g file4g
 +--------+----------------+-------------+----------------+-------------+---------+
 | Name   | Size           │ Pages       │ Cached Size    │ Cached Pages│ Percent │
 |--------+----------------+-------------+----------------+-------------+---------|
@@ -85,7 +90,8 @@ $ sudo pgcacher file1g file2g file3g file4g
 │ Sum    │ 9.766G         │ 2560000     │ 9.766G         │ 2560000     │ 100.000 │
 +--------+----------------+-------------+----------------+-------------+---------+
 
-$ sudo pgcacher /root/rui/*
+# sudo pgcacher /root/rui/*
+
 +------------+----------------+-------------+----------------+-------------+---------+
 | Name       | Size           │ Pages       │ Cached Size    │ Cached Pages│ Percent │
 |------------+----------------+-------------+----------------+-------------+---------|
@@ -102,6 +108,18 @@ $ sudo pgcacher /root/rui/*
 |------------+----------------+-------------+----------------+-------------+---------|
 │ Sum        │ 10.746G        │ 2817091     │ 10.746G        │ 2817091     │ 100.000 │
 +------------+----------------+-------------+----------------+-------------+---------+
+
+# sudo pgcacher -top=3
+
++------------------+----------------+-------------+----------------+-------------+---------+
+| Name             | Size           │ Pages       │ Cached Size    │ Cached Pages│ Percent │
+|------------------+----------------+-------------+----------------+-------------+---------|
+| /root/rui/file4g | 3.906G         | 1024000     | 3.906G         | 1024000     | 100.000 |
+| /root/rui/file3g | 2.930G         | 768000      | 2.930G         | 768000      | 100.000 |
+| /root/rui/file2g | 1.953G         | 512000      | 1.953G         | 512000      | 100.000 |
+|------------------+----------------+-------------+----------------+-------------+---------|
+│ Sum              │ 8.789G         │ 2304000     │ 8.789G         │ 2304000     │ 100.000 │
++------------------+----------------+-------------+----------------+-------------+---------+
 ```
 
 ## pgcacher design

@@ -55,32 +55,30 @@ func GetPcStatus(fname string, filter func(f *os.File) error) (PcStatus, error) 
 	// mincore will prevent overruns of the output vector, but it's not clear
 	// what will be in there when the file is truncated between here and the
 	// mincore() call.
-	fi, err := f.Stat()
+	finfo, err := f.Stat()
 	if err != nil {
 		return pcs, fmt.Errorf("could not stat file: %v", err)
 	}
-	if fi.IsDir() {
+	if finfo.IsDir() {
 		return pcs, errors.New("file is a directory")
 	}
 
-	pcs.Size = fi.Size()
+	pcs.Size = finfo.Size()
 	pcs.Timestamp = time.Now()
-	pcs.Mtime = fi.ModTime()
+	pcs.Mtime = finfo.ModTime()
 
-	mincore, err := FileMincore(f, fi.Size())
+	mincore, err := GetFileMincore(f, finfo.Size())
 	if err != nil {
 		return pcs, err
 	}
+	if mincore == nil {
+		return pcs, nil
+	}
 
 	pcs.Cached = int(mincore.Cached)
-	// pcs.Pages = len(pcs.PPStat)
-	// pcs.Uncached = pcs.Pages - pcs.Cached
 	pcs.Pages = int(mincore.Cached) + int(mincore.Miss)
 	pcs.Uncached = int(mincore.Miss)
 
-	// convert to float for the occasional sparsely-cached file
-	// see the README.md for how to produce one
 	pcs.Percent = (float64(pcs.Cached) / float64(pcs.Pages)) * 100.00
-
 	return pcs, nil
 }

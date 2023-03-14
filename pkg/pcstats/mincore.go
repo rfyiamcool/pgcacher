@@ -32,7 +32,7 @@ type Mincore struct {
 
 // mmap the given file, get the mincore vector, then
 // return it as an []bool
-func FileMincore(f *os.File, size int64) (*Mincore, error) {
+func GetFileMincore(f *os.File, size int64) (*Mincore, error) {
 	//skip could not mmap error when the file size is 0
 	if int(size) == 0 {
 		return nil, nil
@@ -67,20 +67,20 @@ func FileMincore(f *os.File, size int64) (*Mincore, error) {
 	}
 	defer unix.Munmap(mmap)
 
-	mc := make([]bool, vecsz)
+	bbs := make([]bool, vecsz)
 	value := new(Mincore)
 
 	// there is no bitshift only bool
 	for i, b := range vec {
 		if b%2 == 1 {
 			value.Cached++
-			mc[i] = true
+			bbs[i] = true
 		} else {
 			value.Miss++
-			mc[i] = false
+			bbs[i] = false
 		}
 	}
 
-	value.Bytes = mc
+	value.Bytes = bbs
 	return value, nil
 }
