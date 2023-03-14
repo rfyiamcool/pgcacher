@@ -33,7 +33,7 @@ pgcacher <-json <-pps>|-terse|-default> <-nohdr> <-bname> file file file
 
 ## Install
 
-**source code compilation**
+### source code compilation
 
 ```sh
 git clone https://github.com/rfyiamcool/pgcacher.git
@@ -43,11 +43,15 @@ sudo cp pgcacher /usr/local/bin/
 pgcacher -h
 ```
 
-**github releases**
+### github releases
 
 [https://github.com/rfyiamcool/pgcacher/releases](https://github.com/rfyiamcool/pgcacher/releases)
 
-**use binary directly**
+1. download package from github releases url.
+2. decompress the package.
+3. copy `pgcacher` to `/usr/local/bin`.
+
+### use binary directly
 
 test pass on ubuntu, centos 7.x and centos 8.x.
 
