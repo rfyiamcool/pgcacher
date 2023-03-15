@@ -2,7 +2,7 @@
 
 `pgcacher` is used to get page cache statistics for files. Use the **pgcacher** command to know how much cache space the fd of the specified process occupies in the page cache.  Use **pgcacher** to know whether the specified file list is cached in the page cache, and how much space is cached.
 
-Compared with pcstat, `pgcacher` has fixed the problem that the file list of the process is incorrect. It used to be obtained through `/proc/{pid}/maps`, but now it is changed to obtain from `/proc/{pid}/maps` and `/proc/{pid}/fd` at the same time. pgcacher supports more parameters, such as top, worker, depth, least-size, exclude-files and include-files. 😁
+Compared with pcstat, `pgcacher` has fixed the problem that the file list of the process is incorrect. It used to be obtained through `/proc/{pid}/maps`, but now it is changed to obtain from `/proc/{pid}/maps` and `/proc/{pid}/fd` at the same time. pgcacher supports more parameters, such as top, worker, limit, depth, least-size, exclude-files and include-files. 😁
 
 In addition, the pgcacher code is more robust, and also supports concurrency parameters, which can calculate the cache occupancy in the page cache faster. 
 
@@ -14,10 +14,11 @@ In addition, the pgcacher code is more robust, and also supports concurrency par
 
 ```sh
 pgcacher <-json <-pps>|-terse|-default> <-nohdr> <-bname> file file file
-    -depth set the depth of dirs to scan.
+    -limit limit the number of files displayed, default: 500
+    -depth set the depth of dirs to scan, default: 0
     -worker concurrency workers, default: 2
     -pid show all open maps for the given pid
-    -top scan the open files of all processes, show the top few files that occupy the most memory space in the page cache.
+    -top scan the open files of all processes, show the top few files that occupy the most memory space in the page cache, default: false
     -lease-size ignore files smaller than the lastSize, such as '10MB' and '15GB'
     -exclude-files exclude the specified files by wildcard, such as 'a*c?d' and '*xiaorui*,rfyiamcool'
     -include-files only include the specified files by wildcard, such as 'a*c?d' and '*xiaorui?cc,rfyiamcool'
@@ -114,7 +115,7 @@ chmod 777 pgcacher
 │ Sum        │ 10.746G        │ 2817091     │ 10.746G        │ 2817091     │ 100.000 │
 +------------+----------------+-------------+----------------+-------------+---------+
 
-# sudo pgcacher -top=3
+# sudo pgcacher -top -limit 3
 
 +------------------+----------------+-------------+----------------+-------------+---------+
 | Name             | Size           │ Pages       │ Cached Size    │ Cached Pages│ Percent │
