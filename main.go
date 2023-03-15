@@ -12,8 +12,8 @@ import (
 )
 
 type option struct {
-	pid, top, worker, depth               int
-	terse, json, unicode                  bool
+	pid, worker, depth, limit             int
+	top, terse, json, unicode             bool
 	plain, bname                          bool
 	leastSize, excludeFiles, includeFiles string
 }
@@ -23,7 +23,8 @@ var globalOption = new(option)
 func init() {
 	// basic params
 	flag.IntVar(&globalOption.pid, "pid", 0, "show all open maps for the given pid")
-	flag.IntVar(&globalOption.top, "top", 0, "scan the open files of all processes, show the top few files that occupy the most memory space in the page cache.")
+	flag.IntVar(&globalOption.limit, "limit", 500, "limit the number of files displayed")
+	flag.BoolVar(&globalOption.top, "top", false, "scan the open files of all processes, show the top few files that occupy the most memory space in the page cache.")
 	flag.IntVar(&globalOption.depth, "depth", 0, "set the depth of dirs to scan")
 	flag.IntVar(&globalOption.worker, "worker", 2, "concurrency workers")
 	flag.StringVar(&globalOption.leastSize, "least-size", "0mb", "ignore files smaller than the lastSize, such as 10MB and 15GB")
@@ -51,10 +52,14 @@ func main() {
 	files = walkDirs(files, globalOption.depth)
 
 	// init pgcacher obj
-	pg := pgcacher{files: files, leastSize: int64(leastSize), option: globalOption}
+	pg := pgcacher{
+		files:     files,
+		leastSize: int64(leastSize),
+		option:    globalOption,
+	}
 
-	if globalOption.top != 0 {
-		pg.handleTop(globalOption.top)
+	if globalOption.top {
+		pg.handleTop()
 		os.Exit(0)
 	}
 
@@ -63,16 +68,20 @@ func main() {
 	}
 
 	if len(pg.files) == 0 {
-		fmt.Println("files is null ?")
+		fmt.Println("the files is null ???")
 		flag.Usage()
 		os.Exit(1)
 	}
 
 	pg.filterFiles()
 	stats := pg.getPageCacheStats()
-	pg.output(stats)
+	pg.output(stats, pg.option.limit)
 
 	// invalid function, just make a reference relationship with pcstat
+	invalidCall()
+}
+
+func invalidCall() {
 	pcstat.SwitchMountNs(os.Getegid())
 	pcstat.GetPcStatus(os.Args[0])
 }

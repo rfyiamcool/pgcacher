@@ -231,7 +231,10 @@ func (pg *pgcacher) getPageCacheStats() PcStatusList {
 	return stats
 }
 
-func (pg *pgcacher) output(stats PcStatusList) {
+func (pg *pgcacher) output(stats PcStatusList, limit int) {
+	limit = min(len(stats), limit)
+	stats = stats[:limit]
+
 	if pg.option.json {
 		stats.FormatJson()
 	} else if pg.option.terse {
@@ -245,7 +248,7 @@ func (pg *pgcacher) output(stats PcStatusList) {
 	}
 }
 
-func (pg *pgcacher) handleTop(top int) {
+func (pg *pgcacher) handleTop() {
 	// get all active process.
 	procs, err := psutils.Processes()
 	if err != nil || len(procs) == 0 {
@@ -293,9 +296,11 @@ func (pg *pgcacher) handleTop(top int) {
 	// filter files
 	pg.filterFiles()
 
+	// get page cache stats of files.
 	stats := pg.getPageCacheStats()
-	top = min(len(stats), top)
-	pg.output(stats[:top])
+
+	// print
+	pg.output(stats, pg.option.limit)
 }
 
 func min(x, y int) int {
