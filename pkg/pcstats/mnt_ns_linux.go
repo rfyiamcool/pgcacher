@@ -36,11 +36,11 @@ func SwitchMountNs(pid int) {
 	pidns := getMountNs(pid)
 
 	if myns != pidns {
-		setns(pidns)
+		setns(uint(pidns))
 	}
 }
 
-func getMountNs(pid int) int {
+func getMountNs(pid int) int64 {
 	fname := fmt.Sprintf("/proc/%d/ns/mnt", pid)
 	nss, err := os.Readlink(fname)
 
@@ -52,7 +52,7 @@ func getMountNs(pid int) int {
 
 	nss = strings.TrimPrefix(nss, "mnt:[")
 	nss = strings.TrimSuffix(nss, "]")
-	ns, err := strconv.Atoi(nss)
+	ns, err := strconv.ParseInt(nss, 10, 64)
 
 	// not a number? weird ...
 	if err != nil {
@@ -62,7 +62,7 @@ func getMountNs(pid int) int {
 	return ns
 }
 
-func setns(fd int) error {
+func setns(fd uint) error {
 	ret, _, err := unix.Syscall(unix.SYS_SETNS, uintptr(uint(fd)), uintptr(CLONE_NEWNS), 0)
 	if ret != 0 {
 		return fmt.Errorf("syscall SYS_SETNS failed: %v", err)
